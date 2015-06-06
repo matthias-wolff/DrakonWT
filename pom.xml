@@ -26,7 +26,7 @@
     <swt.version>4.4</swt.version>
 
     <!-- GitHub location for maven repository -->
-    <github.server.id>Github</github.server.id> <!-- server id in settings.xml under ~/.m2 -->
+    <github.server.id>DrakonwtGithub</github.server.id> <!-- server id in settings.xml under ~/.m2 -->
     <github.maven.project>DrakonWT</github.maven.project>
     <github.maven.owner>matthias-wolff</github.maven.owner>
     <github.maven.branch>refs/heads/mvn-repo</github.maven.branch>
@@ -146,6 +146,91 @@
       </resource>
     </resources>
     <plugins>
+
+      <!-- Deployment on GitHub.com -->
+      <plugin>
+        <groupId>com.github.github</groupId>
+        <artifactId>site-maven-plugin</artifactId>
+        <version>0.11</version>
+        <configuration>
+          <message>Maven artifacts for ${project.version}</message>  <!-- git commit message -->
+          <server>${github.server.id}</server>
+          <noJekyll>true</noJekyll>                                  <!-- disable webpage processing -->
+          <outputDirectory>${project.build.directory}/mvn-repo</outputDirectory> <!-- matches distribution management repository url above -->
+          <branch>${github.maven.branch}</branch>                       <!-- remote branch name -->
+          <includes>
+            <include>**/*</include>
+          </includes>
+          <repositoryName>${github.maven.project}</repositoryName>      <!-- github repo name -->
+          <repositoryOwner>${github.maven.owner}</repositoryOwner>    <!-- github username -->
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>site</goal>
+            </goals>
+            <phase>deploy</phase><!-- site -->
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- Setting up a local temporary repository to deploy on GitHub.com -->
+      <plugin>
+        <artifactId>maven-deploy-plugin</artifactId>
+        <version>2.8.1</version>
+        <configuration>
+          <altDeploymentRepository>internal.repo::default::file://${project.build.directory}/mvn-repo</altDeploymentRepository>
+        </configuration>
+      </plugin>
+
+      <!-- Generates a API webpage of this project (automatically) -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>2.10.2</version>
+        <executions>
+          <execution>
+            <id>attach-javadocs</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+            <configuration>
+              <additionalparam>-Xdoclint:none</additionalparam>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- Set up java version to the whole project -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.2</version>
+        <configuration>
+          <source>${jdk.version}</source>
+          <target>${jdk.version}</target>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <artifactId>maven-install-plugin</artifactId>
+        <version>2.5.1</version>
+        <configuration>
+          <createChecksum>true</createChecksum>
+          <performRelease>true</performRelease>
+        </configuration>
+      </plugin>
+
+      <!-- download source files automatically -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-eclipse-plugin</artifactId>
+        <version>2.8</version>
+        <configuration>
+          <downloadSources>true</downloadSources>
+        </configuration>
+      </plugin>
+
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.1</version>
