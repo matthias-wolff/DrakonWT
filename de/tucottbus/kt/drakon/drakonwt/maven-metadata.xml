@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>de.tucottbus.kt.drakon</groupId>
+  <artifactId>drakonwt</artifactId>
+  <versioning>
+    <versions>
+      <version>0.0.1-SNAPSHOT</version>
+    </versions>
+    <lastUpdated>20150606075910</lastUpdated>
+  </versioning>
+</metadata>
