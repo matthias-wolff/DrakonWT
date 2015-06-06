@@ -155,8 +155,8 @@ public class DRAKON
     System.out.println("DRAKON.finalize()");
     super.finalize();
   }  
-  // -- TEST SHELL --
 
+  // -- TEST SHELL --
 
   static DrakonChart drakonChart;
   static Button btnShowGrid;
