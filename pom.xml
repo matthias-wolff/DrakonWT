@@ -1,0 +1,176 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>de.tucottbus.kt.drakon</groupId>
+  <artifactId>drakonwt</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+
+  <!-- REPOSITORIES -->
+  <repositories>
+    <repository>
+      <id>swt-repo</id>
+      <url>https://swt-repo.googlecode.com/svn/repo/</url>
+    </repository>
+  </repositories>
+
+  <!-- PROJECT PROPERTIES -->
+  <properties>
+    <!-- TODO: only enable next property after all java classes are prepared 
+      to be UTF8 encoded -->
+    <!-- <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding> -->
+    
+    <!-- MAIN CLASS -->
+    <mainClass>de.tucottbus.kt.drakon.DRAKON</mainClass>
+    
+    <!-- Dependency versions -->
+    <jdk.version>1.8</jdk.version>
+    <swt.version>4.4</swt.version>
+
+    <!-- GitHub location for maven repository -->
+    <github.server.id>Github</github.server.id> <!-- server id in settings.xml under ~/.m2 -->
+    <github.maven.project>DrakonWT</github.maven.project>
+    <github.maven.owner>matthias-wolff</github.maven.owner>
+    <github.maven.branch>refs/heads/mvn-repo</github.maven.branch>
+
+  </properties>
+
+  <distributionManagement>
+    <repository>
+      <id>internal.repo</id>
+      <name>Temporary Staging Repository</name>
+      <url>file://${project.build.directory}/mvn-repo</url>
+    </repository>
+  </distributionManagement>
+
+  <!-- OS/ARCHITECTURE PROFILES FOR SWT AND JOGL -->
+  <profiles>
+    <!-- WINDOWS PROFILES -->
+    <profile>
+      <id>Win86</id>
+      <activation>
+        <os>
+          <family>windows</family>
+          <arch>x86</arch>
+        </os>
+      </activation>
+      <properties>
+        <swt.artifactId>org.eclipse.swt.win32.win32.x86</swt.artifactId>
+        <profile.id>Win86</profile.id>
+      </properties>
+    </profile>
+    <profile>
+      <id>Win64</id>
+      <activation>
+        <os>
+          <family>windows</family>
+          <arch>amd64</arch>
+        </os>
+      </activation>
+      <properties>
+        <swt.artifactId>org.eclipse.swt.win32.win32.x86_64</swt.artifactId>
+        <profile.id>Win64</profile.id>
+      </properties>
+    </profile>
+
+    <!-- LINUX PROFILES -->
+    <profile>
+      <id>Linux86</id>
+      <activation>
+        <os>
+          <family>Linux</family>
+          <arch>x86</arch>
+        </os>
+      </activation>
+      <properties>
+        <swt.artifactId>org.eclipse.swt.gtk.linux.x86</swt.artifactId>
+        <profile.id>Linux86</profile.id>
+      </properties>
+    </profile>
+    <profile>
+      <id>Linux64</id>
+      <activation>
+        <os>
+          <family>Linux</family>
+          <arch>amd64</arch>
+        </os>
+      </activation>
+      <properties>
+        <swt.artifactId>org.eclipse.swt.gtk.linux.x86_64</swt.artifactId>
+        <profile.id>Linux64</profile.id>
+      </properties>
+    </profile>
+
+    <!-- MAC OSX PROFILES -->
+    <profile>
+      <id>MacOSX86</id>
+      <activation>
+        <os>
+          <family>MacosX</family>
+          <arch>x86</arch>
+        </os>
+      </activation>
+      <properties>
+        <swt.artifactId>org.eclipse.swt.cocoa.macosx</swt.artifactId>
+        <profile.id>MacOSX86</profile.id>
+      </properties>
+    </profile>
+    <profile>
+      <id>MacOSX64</id>
+      <activation>
+        <os>
+          <family>MacosX</family>
+          <arch>amd64</arch>
+        </os>
+      </activation>
+      <properties>
+        <swt.artifactId>org.eclipse.swt.cocoa.macosx.x86_64</swt.artifactId>
+        <profile.id>MacOSX64</profile.id>
+      </properties>
+    </profile>
+  </profiles>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.eclipse.swt</groupId>
+      <artifactId>${swt.artifactId}</artifactId>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <sourceDirectory>src</sourceDirectory>
+    <resources>
+      <resource>
+        <directory>src</directory>
+        <excludes>
+          <exclude>**/*.java</exclude>
+        </excludes>
+      </resource>
+    </resources>
+    <plugins>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.1</version>
+        <configuration>
+          <source>1.8</source>
+          <target>1.8</target>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.eclipse.swt</groupId>
+        <artifactId>${swt.artifactId}</artifactId>
+        <version>${swt.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+  <name>DRAKON Widget Toolkit</name>
+  <url>https://github.com/matthias-wolff/DrakonWT</url>
+  <inceptionYear>2014</inceptionYear>
+  <description>Very lightweight SWT-based widget toolkit for displaying simple DRAKON charts.</description>
+  <organization>
+    <name>Chair of Communications Engineering, BTU Cottbus-Senftenberg</name>
+    <url>https://www.tu-cottbus.de/fakultaet3/en/communications-engineering.html</url>
+  </organization>
+</project>
