@@ -266,13 +266,15 @@ public class DrakonChart extends ScrolledComposite
       float scale = (float)printer.getDPI().x/(float)Display.getDefault().getDPI().x;
 
       Point size = new Point(0,0);
-      if (body.getChildren().length>0)
-        size = body.getChildren()[0].getSize();
+      Control[] children = body.getChildren();
+      if (children.length>0)
+        size = children[0].getSize();
       Color cLtGrey = new Color(gc.getDevice(),235,236,236);
       gc.setBackground(cLtGrey);
-      gc.fillRectangle(0,0,Math.round((size.x+20)*scale),Math.round((size.y+20)*scale));
+      gc.fillRectangle(0,0,(int)((size.x+20)*scale + .5),(int)((size.y+20)*scale + .5));
       
-      body.drawAllOn(gc,10+getOrigin().x,10+getOrigin().y,scale);
+      Point origin = getOrigin();
+      body.drawAllOn(gc,10+origin.x,10+origin.y,scale);
       printer.endJob();
       cLtGrey.dispose();
       gc.dispose();

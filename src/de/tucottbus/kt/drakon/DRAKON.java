@@ -113,7 +113,7 @@ public class DRAKON
    * Insert points mask.
    */
   public static final int INSERT_TYPE = 0x00F0;
-  
+    
   // WireIcon styles
   public static final int WIRE_N_E   = 0x0100;
   public static final int WIRE_N_S   = 0x0200;
@@ -130,6 +130,11 @@ public class DRAKON
   public static final int WIRE_JOIN  = 0x0D00;
   public static final int WIRE_LOOP  = 0x0E00;
   public static final int WIRETYPE   = 0X0F00;
+  
+  /**
+   * Rendering style for swt composites 
+   */
+  public static final int SWT_COMPOSITE_STYLE = /*SWT.NO_REDRAW_RESIZE |*/ SWT.DOUBLE_BUFFERED;
   
   /**
    * Returns the DRAKON singleton.
@@ -169,7 +174,7 @@ public class DRAKON
     shell.setSize(1024,768);
     shell.setLayout(new GridLayout(1,false));
     
-    Composite cmpsTools = new Composite(shell,SWT.NONE);
+    Composite cmpsTools = new Composite(shell,SWT_COMPOSITE_STYLE);
     cmpsTools.setLayoutData(new GridData(SWT.FILL,SWT.TOP,false,false));
     RowLayout rl = new RowLayout(SWT.HORIZONTAL);
     rl.center = true;
@@ -282,8 +287,7 @@ public class DRAKON
       @Override
       public void widgetSelected(SelectionEvent e)
       {
-        float scale = drakonChart.getScale();
-        if (scale>0.2f)
+        if (drakonChart.getScale()>0.2f)
         {
           drakonChart.setScale(drakonChart.getScale()-0.1f);
           drakonChart.pack();

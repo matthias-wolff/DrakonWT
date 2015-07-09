@@ -9,15 +9,16 @@ import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.Transform;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-
 import de.tucottbus.kt.drakon.DRAKON;
 import de.tucottbus.kt.drakon.DrakonChart;
 
@@ -31,9 +32,9 @@ public abstract class DrakonWidget extends Composite
   protected static final int LINE_WIDTH = 1;
   
   // FIXME: Colors not released!
-  protected static Color cGrid = new Color(Display.getDefault(),126,113,177);
-  protected static Color cHoverBg = new Color(Display.getDefault(),237,235,246);  
-  protected static Color cHoverFg = new Color(Display.getDefault(),126,113,177);
+  protected static final Color cGrid = new Color(Display.getDefault(),126,113,177);
+  protected static final Color cHoverBg = new Color(Display.getDefault(),237,235,246);
+  protected static final Color cHoverFg = new Color(Display.getDefault(),126,113,177);
   protected static Font  fText = null;
 
   private int style = DRAKON.NONE;
@@ -61,7 +62,7 @@ public abstract class DrakonWidget extends Composite
    */
   public DrakonWidget(Composite parent, int style)
   {
-    super(parent, SWT.NONE);
+    super(parent, DRAKON.SWT_COMPOSITE_STYLE);
     if (parent instanceof DrakonIcon)
       throw new IllegalArgumentException("A Drakon icon cannot have children.");
 
@@ -246,10 +247,13 @@ public abstract class DrakonWidget extends Composite
    */
   public Point getActualSize()
   {
+    float chartScale = getChart().getScale();
+    Rectangle clientArea = getClientArea();
     return new Point
     (
-      (int)Math.ceil(getClientArea().width / getChart().getScale()),
-      (int)Math.ceil(getClientArea().height / getChart().getScale())
+ 
+      (int)Math.ceil(clientArea.width / chartScale),
+      (int)Math.ceil(clientArea.height / chartScale)
     );
   }
   
@@ -305,9 +309,9 @@ public abstract class DrakonWidget extends Composite
   {
     if (!canCollapse()) collapsed = false;
     if (this.collapsed==collapsed) return;
-    this.collapsed = collapsed;
+    boolean visible = !(this.collapsed = collapsed);
     for (Control control : getChildren())
-      control.setVisible(!collapsed);
+      control.setVisible(visible);
     getChart().pack();
   }
   
@@ -342,8 +346,8 @@ public abstract class DrakonWidget extends Composite
    */
   public final DrakonWidget[] getSelectGroup()
   {
-    if (isCollapsed()) return new DrakonWidget[]{ this };
-    if (!isControlPath()) return new DrakonWidget[]{ this };
+    if (isCollapsed() || !isControlPath())
+      return new DrakonWidget[]{ this };
     
     ArrayList<DrakonWidget> group = new ArrayList<DrakonWidget>();
     for (Control control : getParent().getChildren())
@@ -353,7 +357,7 @@ public abstract class DrakonWidget extends Composite
       if (widget.isControlPath())
         group.add(widget);
     }
-    return group.toArray(new DrakonWidget[]{});
+    return group.toArray(new DrakonWidget[group.size()]);
   }
 
   /**
@@ -402,13 +406,12 @@ public abstract class DrakonWidget extends Composite
 
   public int U2Px(float units)
   {
-    return Math.round(getChart().getScale()*units);
+    return (int)(getChart().getScale()*units + .5f);
   }
 
   protected boolean twisterHitTest(int x, int y)
   {
-    if (hasTwister()==0) return false;
-    return (x>=0 && x<U2Px(12) && y>=0 && y<U2Px(12));
+    return hasTwister()!=0 && x>=0 && x<U2Px(12) && y>=0 && y<U2Px(12);
   }
   
   // -- Drawing --
@@ -430,35 +433,38 @@ public abstract class DrakonWidget extends Composite
   protected final void drawOn(GC gc, int offsetx, int offsety, float scale)
   {
     // TODO: Commit a transform as parameter?
-    if (!isVisible()) return;
-    if (isComposite() && !isCollapsed()) return;
+    if (!isVisible() || (isComposite() && !isCollapsed())) return;
     if (hover)
     {
       gc.setBackground(cHoverBg);
-      gc.fillRectangle(getClientArea().x, getClientArea().y,
-          getClientArea().width, getClientArea().height);
+      Rectangle clientArea = getClientArea();
+      gc.fillRectangle(clientArea.x, clientArea.y,
+          clientArea.width, clientArea.height);
     }
-    if (getChart().isGridVisible())
+    DrakonChart chart = getChart();
+    if (chart.isGridVisible())
     {
       gc.setForeground(cGrid);
       gc.setLineStyle(SWT.LINE_DOT);
-      gc.drawRectangle(getClientArea().x, getClientArea().y,
-          getClientArea().width, getClientArea().height);
+      Rectangle clientArea = getClientArea();
+      gc.drawRectangle(clientArea.x, clientArea.y,
+          clientArea.width, clientArea.height);
     }
     
-    // Draw widget
-    if (hover)
-      gc.setForeground(cHoverFg);
-    else
-      gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_BLACK));
-    gc.setBackground(gc.getDevice().getSystemColor(SWT.COLOR_WHITE));
+    Device device = gc.getDevice();
+    
+    final Color systemBlack = device.getSystemColor(SWT.COLOR_BLACK);
+    final Color systemWhite = device.getSystemColor(SWT.COLOR_WHITE);
+        
+    gc.setForeground(hover ? cHoverFg : systemBlack);    
+    gc.setBackground(systemWhite);
     gc.setAntialias(SWT.ON);
     gc.setLineCap(SWT.CAP_ROUND);
     gc.setLineJoin(SWT.JOIN_ROUND);
     gc.setLineStyle(SWT.LINE_SOLID);
-    Transform t = new Transform(gc.getDevice());
+    Transform t = new Transform(device);
     t.translate(offsetx*scale, offsety*scale);
-    t.scale(getChart().getScale()*scale,getChart().getScale()*scale);
+    t.scale(chart.getScale()*scale,chart.getScale()*scale);
     gc.setTransform(t);
     gc.setLineWidth(LINE_WIDTH);
     
@@ -466,15 +472,16 @@ public abstract class DrakonWidget extends Composite
     DrakonWidget.this.drawIconOn(gc);
 
     // Draw expand/collapse button
-    gc.setBackground(gc.getDevice().getSystemColor(SWT.COLOR_WHITE));
+    gc.setBackground(systemWhite);
     gc.setForeground(cHoverFg);
     gc.setLineWidth(LINE_WIDTH);
-    if (hasTwister()>0 || (hover && hasTwister()!=0))
+    int hasTwister = hasTwister();
+    if (hasTwister>0 || (hover && hasTwister!=0))
     {
       gc.fillOval(0,0,12,12);
       gc.drawOval(2,2,8,8);
       gc.drawLine(2,6,10,6);
-      if (hasTwister()>0)
+      if (hasTwister>0)
         gc.drawLine(6,2,6,10);
     }
     
@@ -483,12 +490,13 @@ public abstract class DrakonWidget extends Composite
     {
       gc.setBackground(cHoverFg);
       gc.setForeground(cHoverFg);
-      int w  = getIconSize().x;
+      int wHalf  = getIconSize().x/2;
       int hh = getActualSize().y;
-      if ((getStyle()&DRAKON.INSERT_N)!=0)
-        drawInsertPointOn(gc,w/2,0);
-      if ((getStyle()&DRAKON.INSERT_S)!=0)
-        drawInsertPointOn(gc,w/2,hh);
+      int style = getStyle();
+      if ((style&DRAKON.INSERT_N)!=0)
+        drawInsertPointOn(gc,wHalf,0);
+      if ((style&DRAKON.INSERT_S)!=0)
+        drawInsertPointOn(gc,wHalf,hh);
     }
 
     // Clean up
@@ -534,19 +542,17 @@ public abstract class DrakonWidget extends Composite
         
     if (fText==null)
     {
-      String fname = gc.getDevice().getSystemFont().getFontData()[0].getName();
+      final String fname = gc.getDevice().getSystemFont().getFontData()[0].getName();
       // FIXME: Font not released!
       fText = new Font(Display.getDefault(),fname, 7, SWT.NORMAL);
     }
     gc.setFont(fText);
-    if (hover)
-      gc.setForeground(cHoverFg);
-    else
-      gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_BLACK));
+    final Color systemBlack = gc.getDevice().getSystemColor(SWT.COLOR_BLACK);
+    gc.setForeground(hover ? cHoverFg : systemBlack);
+    
     s = abbreviateString(gc,s,maxWidth);
-    int th = gc.stringExtent(s).y;
-    int tw = gc.stringExtent(s).x;
-    gc.drawString(s,x-tw/2,y-th/2,true);
+    Point stringExtend = gc.stringExtent(s);
+    gc.drawString(s,x-stringExtend.x/2,y-stringExtend.y/2,true);
   }
 
   /**
@@ -572,8 +578,9 @@ public abstract class DrakonWidget extends Composite
    */
   public void drawAllOn(GC gc, int offsetx, int offsety, float scale)
   {
-    offsetx += getBounds().x;
-    offsety += getBounds().y;
+    Rectangle bounds = getBounds();
+    offsetx += bounds.x;
+    offsety += bounds.y;
     drawOn(gc,offsetx,offsety,scale);
     for (Control control : getChildren())
       if (control instanceof DrakonWidget)

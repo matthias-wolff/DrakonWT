@@ -151,22 +151,27 @@ public class DrakonMacro extends DrakonWidget
   @Override
   protected void drawIconOn(GC gc)
   {
-    int w  = getIconSize().x;
-    int h  = getIconSize().y;
+    Point iconSize = getIconSize();
+    int w  = iconSize.x;
+    int wHalf = w/2;
+    int w8 = w-8;
+    int h  = iconSize.y;
     int hh = getActualSize().y;
+    int h4 = h-4;
+    int h8 = h-8;
     if (isControlPath())
     {
-      gc.drawLine(w/2,0,w/2,hh);
+      gc.drawLine(wHalf,0,wHalf,hh);
     }
     else
     {
-      gc.drawLine(w/2,0,w/2,4);
-      gc.fillRectangle(4,4,w-8,h-8);
-      gc.drawRectangle(4,4,w-8,h-8);
-      gc.drawLine(8,4,8,h-4);
-      gc.drawLine(w-8,4,w-8,h-4);
-      gc.drawLine(w/2,h-4,w/2,hh);
+      gc.drawLine(wHalf,0,wHalf,4);
+      gc.fillRectangle(4,4,w8,h8);
+      gc.drawRectangle(4,4,w8,h8);
+      gc.drawLine(8,4,8,h4);
+      gc.drawLine(w8,4,w8,h4);
+      gc.drawLine(wHalf,h4,wHalf,hh);
     }
-    drawCenteredStringOn(gc,getText(),w/2,h/2,w-10);
+    drawCenteredStringOn(gc,getText(),wHalf,h/2,w-10);
   }
 }
