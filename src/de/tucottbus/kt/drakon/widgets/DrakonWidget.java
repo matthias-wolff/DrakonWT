@@ -19,6 +19,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+
 import de.tucottbus.kt.drakon.DRAKON;
 import de.tucottbus.kt.drakon.DrakonChart;
 
@@ -83,21 +84,21 @@ public abstract class DrakonWidget extends Composite
         // HACK: mouseEnter event sometimes missing when moving cursor slowly
         // -->   Wait for hover event to catch up
         setHover(true);
-        getChart().setInserting(true);
+        //getChart().setInserting(true);
       }
       
       @Override
       public void mouseExit(MouseEvent e)
       {
         setHover(false);
-        getChart().setInserting(false);
+        //getChart().setInserting(false);
       }
       
       @Override
       public void mouseEnter(MouseEvent e)
       {
         setHover(true);
-        getChart().setInserting(true);
+        //getChart().setInserting(true);
       }
     });
     addMouseListener(new MouseListener()
