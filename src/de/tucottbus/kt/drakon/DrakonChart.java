@@ -145,6 +145,22 @@ public class DrakonChart extends ScrolledComposite
     for (Control control : body.getChildren())
       control.dispose();
   }
+
+  public void expandAll()
+  {
+    for (Control control : body.getChildren())
+      if (control instanceof DrakonMacro)
+        ((DrakonMacro)control).setCollapsed(false,true);
+    pack();
+  }
+  
+  public void collapseAll()
+  {
+    for (Control control : body.getChildren())
+      if (control instanceof DrakonMacro)
+        ((DrakonMacro)control).setCollapsed(true,true);
+    pack();
+  }
   
   public void setInserting(boolean inserting)
   {

@@ -134,7 +134,7 @@ public class DrakonMacro extends DrakonWidget
   @Override
   public int hasTwister()
   {
-    return isCollapsed() ? +1 : 0;
+    return isCollapsed()&&getChildren().length>1 ? +1 : 0;
   }
   
   /**
@@ -145,7 +145,7 @@ public class DrakonMacro extends DrakonWidget
   @Override
   public boolean canCollapse()
   {
-    return true;
+    return getChildren().length>1;
   }
   
   @Override

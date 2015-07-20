@@ -296,7 +296,6 @@ public abstract class DrakonWidget extends Composite
    * Determines whether this widget can be collapsed into an icon.
    */
   public abstract boolean canCollapse();
-  
   /**
    * Collapses this macro.
    * 
@@ -308,12 +307,33 @@ public abstract class DrakonWidget extends Composite
    */
   public void setCollapsed(boolean collapsed)
   {
+    setCollapsed(collapsed,false);
+  }
+
+  /**
+   * Collapses this macro.
+   * 
+   * <p>NOTE: The method does nothing if {@link #canCollapse()} returns#
+   * <code>false</code>.</p>
+   * 
+   * @param collapsed
+   *          The new collapsed state.
+   * @param recursive
+   *          Recursively collapse or expand children.
+   */
+  public void setCollapsed(boolean collapsed, boolean recursive)
+  {
+    boolean collapsedSave = collapsed;
     if (!canCollapse()) collapsed = false;
-    if (this.collapsed==collapsed) return;
+    if (this.collapsed==collapsed && !recursive) return;
     boolean visible = !(this.collapsed = collapsed);
     for (Control control : getChildren())
+    {
       control.setVisible(visible);
-    getChart().pack();
+      if (recursive && control instanceof DrakonMacro)
+        ((DrakonMacro)control).setCollapsed(collapsedSave, recursive);
+    }
+    if (!recursive) getChart().pack();
   }
   
   /**
