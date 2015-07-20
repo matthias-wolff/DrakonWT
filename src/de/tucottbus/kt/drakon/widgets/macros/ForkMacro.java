@@ -167,6 +167,12 @@ public class ForkMacro extends DrakonMacro
       rightBody.setIconSize(wReduced,-1);
       if (icnWire2!=null) icnWire2.setIconSize(wReduced,-1);
     }
+    else
+    {
+      if (icnWire1!=null) icnWire1.setIconSize(-1,-1);
+      rightBody.setIconSize(-1,-1);
+      if (icnWire2!=null) icnWire2.setIconSize(-1,-1);
+    }
   }
 
 }

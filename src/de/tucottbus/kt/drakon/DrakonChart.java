@@ -170,7 +170,7 @@ public class DrakonChart extends ScrolledComposite
   {
     if (inserting == insertingRq) return;
     inserting = insertingRq;
-    Display.getDefault().asyncExec(new Runnable()
+    Display.getDefault().syncExec(new Runnable()
     {
       @Override
       public void run()
